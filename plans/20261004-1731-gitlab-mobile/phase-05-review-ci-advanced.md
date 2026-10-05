@@ -15,28 +15,28 @@
 
 ## Tasks: MR và issue completeness
 
-- [ ] MR list/detail/create từ existing source/target branch, filter assigned/reviewer, CI head pipeline và merge readiness.
-- [ ] Diff phân trang theo file và revision; handle collapsed/too_large/missing fields. Không dùng `/changes` deprecated. File vượt server diff limits chỉ link web/giải thích, không hứa `/raw_diffs` vượt mọi giới hạn.
-- [ ] Comment/reply/resolve discussions khi có quyền; inline comment chứa base/start/head SHA và line/path đúng revision. Nếu MR đổi revision, invalidate draft position, yêu cầu xem lại.
-- [ ] Approve/unapprove đúng head SHA; 409 refresh revision. Distinguish approve endpoint Free với approval rules/state cần Premium/Ultimate; không suy luận “tất cả approval API đều Premium”.
-- [ ] GitLab policy yêu cầu password/forced SAML reauthentication không tương thích → disabled native approve + guided external link, không hỏi user password trong app.
-- [ ] Merge chỉ user explicit confirm, SHA guard, reread merge status/CI và server policies. Không implement auto-merge/bypass checks/merge trains trong scope này; nếu project bắt buộc workflow chưa hỗ trợ thì chuyển link GitLab có giải thích.
-- [ ] Issue assign/labels/edit metadata theo quyền; tránh tự overwite thay đổi đồng thời khi form stale.
+- [x] MR list/detail/create từ existing source/target branch, filter assigned/reviewer, CI head pipeline và merge readiness.
+- [x] Diff phân trang theo file và revision; handle collapsed/too_large/missing fields. Không dùng `/changes` deprecated. File vượt server diff limits chỉ link web/giải thích, không hứa `/raw_diffs` vượt mọi giới hạn.
+- [x] Comment/reply/resolve discussions khi có quyền; inline comment chứa base/start/head SHA và line/path đúng revision. Nếu MR đổi revision, invalidate draft position, yêu cầu xem lại.
+- [x] Approve/unapprove đúng head SHA; 409 refresh revision. Distinguish approve endpoint Free với approval rules/state cần Premium/Ultimate; không suy luận “tất cả approval API đều Premium”.
+- [x] GitLab policy yêu cầu password/forced SAML reauthentication không tương thích → disabled native approve + guided external link, không hỏi user password trong app.
+- [x] Merge chỉ user explicit confirm, SHA guard, reread merge status/CI và server policies. Không implement auto-merge/bypass checks/merge trains trong scope này; nếu project bắt buộc workflow chưa hỗ trợ thì chuyển link GitLab có giải thích.
+- [x] Issue assign/labels/edit metadata theo quyền; tránh tự overwite thay đổi đồng thời khi form stale.
 
 ## Tasks: CI/CD nâng cao
 
-- [ ] Environment list/detail và deployment history/ref/SHA/status/external URL; nullable deployable không gây crash. API create deployment record không được dùng để chạy deployment.
-- [ ] Link manual deployment job sang play flow phase 04; protected environment/deployment approval được hiển thị bằng capability/tier/policy, server authoritative.
-- [ ] Optional deployment approval API bật khi tier/quyền đã xác minh; trạng thái approved không đồng nghĩa deploy completed.
-- [ ] Redeploy deployment job cũ chỉ khi mapping policy đã chấp thuận, artifacts còn usable và job/CI script phù hợp. Explicitly distinguish redeploy với rollback.
-- [ ] Rollback project-specific: pipeline chuyên dụng với ref/inputs cho target revision và allowed environment; user xem tác động và xác nhận. Không có generic rollback endpoint, không rollback database tự động, không pipeline retry để redeploy successful pipeline.
-- [ ] Environment stop chỉ bật khi configured `on_stop` workflow và user có quyền; xác nhận. Không `force=true` mặc định vì có thể bỏ qua việc dọn tài nguyên. Không thêm delete environment/deployment.
-- [ ] Schedule list/detail/create/edit/active toggle/play/delete; cron syntax và timezone, branch/tag ref ambiguity; owner/take ownership chỉ khi workflow có quyền và user xác nhận. Delete một schedule phải có destructive confirmation, không bulk delete và không auto retry khi outcome unknown.
+- [x] Environment list/detail và deployment history/ref/SHA/status/external URL; nullable deployable không gây crash. API create deployment record không được dùng để chạy deployment.
+- [x] Link manual deployment job sang play flow phase 04; protected environment/deployment approval được hiển thị bằng capability/tier/policy, server authoritative.
+- [x] Optional deployment approval API bật khi tier/quyền đã xác minh; trạng thái approved không đồng nghĩa deploy completed.
+- [x] Redeploy deployment job cũ chỉ khi mapping policy đã chấp thuận, artifacts còn usable và job/CI script phù hợp. Explicitly distinguish redeploy với rollback.
+- [x] Rollback project-specific: pipeline chuyên dụng với ref/inputs cho target revision và allowed environment; user xem tác động và xác nhận. Không có generic rollback endpoint, không rollback database tự động, không pipeline retry để redeploy successful pipeline.
+- [x] Environment stop chỉ bật khi configured `on_stop` workflow và user có quyền; xác nhận. Không `force=true` mặc định vì có thể bỏ qua việc dọn tài nguyên. Không thêm delete environment/deployment.
+- [x] Schedule list/detail/create/edit/active toggle/play/delete; cron syntax và timezone, branch/tag ref ambiguity; owner/take ownership chỉ khi workflow có quyền và user xác nhận. Delete một schedule phải có destructive confirmation, không bulk delete và không auto retry khi outcome unknown.
 - [ ] Mở CI mutation cho production/môi trường chưa phân loại chỉ sau khi project policy rõ, local step-up/confirmation/server protections và mandatory auth/mutation safety tests đạt. Mốc phase 04 luôn giữ non-production allowlist, không mở bằng toggle chưa kiểm chứng.
-- [ ] Hiển thị next run/owner server state; play không thay đổi lần lịch kế tiếp. Không lấy scheduler trên điện thoại thay GitLab schedule.
-- [ ] Pipeline inputs GA từ GitLab 18.1; schedule inputs GA 18.1 (introduced 17.11). Trên bản không hỗ trợ, không gửi field mới; variables chỉ fallback nếu CI config và chính sách cho phép, không bảo đảm semantics tương đương.
-- [ ] Test report summary/details chỉ khi project xuất JUnit đúng; không có report hiển thị empty, không suy ra mọi job pass vì thiếu report.
-- [ ] CI lint config hiện có/read-only draft: `GET /ci/lint` hoặc `POST /ci/lint` với content/context; dry_run mô phỏng config/rules, không chạy CI. Config includes có thể cần quyền/API context; lint pass không bảo đảm deploy sẽ thành công.
+- [x] Hiển thị next run/owner server state; play không thay đổi lần lịch kế tiếp. Không lấy scheduler trên điện thoại thay GitLab schedule.
+- [x] Pipeline inputs GA từ GitLab 18.1; schedule inputs GA 18.1 (introduced 17.11). Trên bản không hỗ trợ, không gửi field mới; variables chỉ fallback nếu CI config và chính sách cho phép, không bảo đảm semantics tương đương.
+- [x] Test report summary/details chỉ khi project xuất JUnit đúng; không có report hiển thị empty, không suy ra mọi job pass vì thiếu report.
+- [x] CI lint config hiện có/read-only draft: `GET /ci/lint` hoặc `POST /ci/lint` với content/context; dry_run mô phỏng config/rules, không chạy CI. Config includes có thể cần quyền/API context; lint pass không bảo đảm deploy sẽ thành công.
 - [ ] Runner metadata read-only ở job detail; không quản lý/register/pause runners. Không expose hoặc sửa kho project/group CI secrets trên điện thoại.
 
 ## Acceptance criteria
@@ -57,3 +57,11 @@ Live test mutations chỉ sandbox; cần người quản lý chấp thuận cả
 ## Failure protocol
 
 Không đoán quyền theo numeric role hoặc HTTP 404 duy nhất. Không đổi rollback spec để “làm cho nút hoạt động”; policy CI phải được chủ project cung cấp và test trước. Nếu MR approval cần mật khẩu, không tạo password vault; hỗ trợ ngoại lệ web hợp lệ.
+
+## Execution evidence — 2026-10-04
+
+MR files/diffs/discussions/inline revision/approve/merge guard, environments/deployments/approval/stop/rollback policy, schedules/inputs/JUnit/CI lint có source; DTO/version/revision guard tests pass.
+
+Chưa live role/tier/protected policy, sandbox redeploy/rollback, native MR/schedule journeys hoặc DST/device coverage.
+
+Checkbox đã đánh dấu ghi nhận task source-level, không chứng nhận acceptance/native/live của toàn phase. Dòng Status ở đầu là snapshot ban đầu; overall plan vẫn in-progress. [Final report](../reports/implementation-261004-1903-current-plan.md) chứa coverage và questions/assumptions; [verification](../../docs/verification-results.md) ghi check thực tế.

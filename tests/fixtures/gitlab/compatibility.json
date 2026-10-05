@@ -1,0 +1,9 @@
+{
+  "synthetic": true,
+  "project": {"id":4,"name":"Sandbox","path_with_namespace":"team/sandbox","default_branch":null,"description":null,"new_field":true},
+  "issue": {"id":100,"iid":7,"title":"Synthetic issue","state":"opened","description":null,"labels":[]},
+  "pipeline": {"id":40,"status":"future-status","ref":"sandbox","sha":"abc123","source":"push"},
+  "job": {"id":50,"name":"check","stage":"test","status":"scheduled","ref":"sandbox","runner":null,"environment":null,"artifacts_file":null},
+  "deployment": {"id":60,"sha":"abc123","ref":"sandbox","status":"success","deployable":null,"environment":{"id":3,"name":"staging"}},
+  "mr": {"id":200,"iid":8,"title":"Synthetic MR","state":"opened","sha":"old-head","source_branch":"feature","target_branch":"main","diff_refs":null,"head_pipeline":null}
+}

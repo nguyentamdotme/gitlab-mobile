@@ -21,32 +21,32 @@
 
 ### 1. Read-only trước
 
-- [ ] Pipeline list/filter status/ref/source, details SHA/ref/source/timing/actor; phân trang đầy đủ.
-- [ ] Job list theo pipeline/stage với retried jobs tùy chọn; hiển thị unknown/new status không crash. Stage list không giả DAG chính xác nếu API không có needs graph.
-- [ ] Bridges/downstream pipeline khác project hoặc child pipeline được truy cập theo project ID thật; 403/404 hiển thị “không có quyền hoặc không còn tồn tại”. Không dùng ID parent để gọi downstream nhầm project.
-- [ ] Distinguish manual, delayed/scheduled, skipped, pending, running, failed, success, canceled, canceling, blocked và allow_failure. Không tự “play” delayed job hoặc archived job.
-- [ ] Poll chỉ screen active/online/foreground, terminal thì stop; cancel AbortController để không apply out-of-order stale response.
+- [x] Pipeline list/filter status/ref/source, details SHA/ref/source/timing/actor; phân trang đầy đủ.
+- [x] Job list theo pipeline/stage với retried jobs tùy chọn; hiển thị unknown/new status không crash. Stage list không giả DAG chính xác nếu API không có needs graph.
+- [x] Bridges/downstream pipeline khác project hoặc child pipeline được truy cập theo project ID thật; 403/404 hiển thị “không có quyền hoặc không còn tồn tại”. Không dùng ID parent để gọi downstream nhầm project.
+- [x] Distinguish manual, delayed/scheduled, skipped, pending, running, failed, success, canceled, canceling, blocked và allow_failure. Không tự “play” delayed job hoặc archived job.
+- [x] Poll chỉ screen active/online/foreground, terminal thì stop; cancel AbortController để không apply out-of-order stale response.
 
 ### 2. Log và artifacts an toàn
 
-- [ ] GET trace text; virtualized lines, ANSI whitelist, jump-to-end, search, copy user-selected đoạn. Không render log bằng HTML/WebView thực thi.
+- [x] GET trace text; virtualized lines, ANSI whitelist, jump-to-end, search, copy user-selected đoạn. Không render log bằng HTML/WebView thực thi.
 - [ ] Bounded retrieval ~1 MiB: hard byte cap/abort phải ở transport khi body lớn; nếu fetch/native runtime không chứng minh được cap, không auto-poll trace quá lớn, chuyển file download explicit. View cap sau full-download không phải memory bound.
-- [ ] Poll 5–10s khi log nhỏ/job active, backoff/stop offline/background/terminal; không assume Range/cursor/WebSocket có trên REST trace.
-- [ ] Artifact metadata/expiry + download theo job ID ưu tiên để định danh chính xác revision. GET binary, cancel/progress nếu transport hỗ trợ, size/quota và filename sanitization.
-- [ ] Cross-origin CDN redirect dùng request không Authorization/PRIVATE-TOKEN; không token trong URL. Redirect không ký/hết hạn mà cần credential ở origin không tin cậy → fail closed, không “forward token để chạy được”.
-- [ ] Không auto-unzip/open HTML/APK; sandbox storage, confirmation share, startup/logout expiry cleanup và quota policy. File lớn tải theo yêu cầu, không giữ binary trên JS heap.
+- [x] Poll 5–10s khi log nhỏ/job active, backoff/stop offline/background/terminal; không assume Range/cursor/WebSocket có trên REST trace.
+- [x] Artifact metadata/expiry + download theo job ID ưu tiên để định danh chính xác revision. GET binary, cancel/progress nếu transport hỗ trợ, size/quota và filename sanitization.
+- [x] Cross-origin CDN redirect dùng request không Authorization/PRIVATE-TOKEN; không token trong URL. Redirect không ký/hết hạn mà cần credential ở origin không tin cậy → fail closed, không “forward token để chạy được”.
+- [x] Không auto-unzip/open HTML/APK; sandbox storage, confirmation share, startup/logout expiry cleanup và quota policy. File lớn tải theo yêu cầu, không giữ binary trên JS heap.
 
 ### 3. Lệnh CI có kiểm soát
 
-- [ ] Run pipeline dùng POST singular `/projects/:id/pipeline`, ref từ branch/tag API; variables theo project policy; inputs chỉ khi version/config hỗ trợ, không dùng làm kho secret.
-- [ ] Pipeline retry nghĩa là retry failed/canceled jobs, không “run toàn bộ pipeline lại”; cancel có thể trả 200 mà job chưa terminal, phải đọc lại.
-- [ ] Job retry trả job mới: route/cache cập nhật ID và list retried; không poll job cũ để kết luận retry thất bại.
-- [ ] Manual job play từ explicit user action, reread status, confirm ref/SHA/environment. Job deploy/prod hoặc environment unknown cần confirm rủi ro và local step-up; authorization server vẫn quyết định.
+- [x] Run pipeline dùng POST singular `/projects/:id/pipeline`, ref từ branch/tag API; variables theo project policy; inputs chỉ khi version/config hỗ trợ, không dùng làm kho secret.
+- [x] Pipeline retry nghĩa là retry failed/canceled jobs, không “run toàn bộ pipeline lại”; cancel có thể trả 200 mà job chưa terminal, phải đọc lại.
+- [x] Job retry trả job mới: route/cache cập nhật ID và list retried; không poll job cũ để kết luận retry thất bại.
+- [x] Manual job play từ explicit user action, reread status, confirm ref/SHA/environment. Job deploy/prod hoặc environment unknown cần confirm rủi ro và local step-up; authorization server vẫn quyết định.
 - [ ] Mốc nội bộ chỉ bật mọi CI mutation (run/retry/play/cancel) trên project/job/ref allowlist được chủ project xác nhận non-production hoặc không tác động production. Không xác định được environment/tác động thì read-only; confirmation đơn thuần không mở khóa. Production/unknown-environment cần phase 05 policy và mandatory safety gate.
-- [ ] Prevent double tap/in-flight repeats; preflight ensureValidToken; không retry write tự động vì 401/429/5xx/network error.
-- [ ] Trước dispatch, save journal intent tối thiểu: account namespace, action type, numeric target IDs, timestamp, SHA/ref fingerprint nếu cần và generation; không variables/comment body/token. SecureStore size/quota có bound; không lưu được journal thì chưa gửi lệnh. Journal không là offline queue.
-- [ ] Sau response success, invalidate pipeline/jobs/environment affected; toast không đồng nghĩa job đã hoàn tất. Clear journal khi đã reconcile/acknowledge kết quả; giữ uncertain intent khi process death/timeout.
-- [ ] Timeout sau gửi hoặc process death → outcome unknown. Sau restart, restore account rồi đọc journal/reconcile bằng GET; không resend. Match IDs/ref/SHA/time window có thể không duy nhất: khi chưa phân biệt được, thông báo và chặn action tương đương cho tới user xác nhận đã kiểm tra. Logout xóa journal; account khác không nhận intent cũ.
+- [x] Prevent double tap/in-flight repeats; preflight ensureValidToken; không retry write tự động vì 401/429/5xx/network error.
+- [x] Trước dispatch, save journal intent tối thiểu: account namespace, action type, numeric target IDs, timestamp, SHA/ref fingerprint nếu cần và generation; không variables/comment body/token. SecureStore size/quota có bound; không lưu được journal thì chưa gửi lệnh. Journal không là offline queue.
+- [x] Sau response success, invalidate pipeline/jobs/environment affected; toast không đồng nghĩa job đã hoàn tất. Clear journal khi đã reconcile/acknowledge kết quả; giữ uncertain intent khi process death/timeout.
+- [x] Timeout sau gửi hoặc process death → outcome unknown. Sau restart, restore account rồi đọc journal/reconcile bằng GET; không resend. Match IDs/ref/SHA/time window có thể không duy nhất: khi chưa phân biệt được, thông báo và chặn action tương đương cho tới user xác nhận đã kiểm tra. Logout xóa journal; account khác không nhận intent cũ.
 
 ## Acceptance criteria
 
@@ -67,3 +67,11 @@ Contract read-only mặc định. CI write E2E cần sandbox được cho phép,
 ## Failure protocol
 
 Transport redirect/byte-bound chưa an toàn thì khóa phần tải tương ứng và ghi blocker, không downgrade bảo mật. Không biến retry pipeline thành cơ chế rollback; không thực hiện mutation chỉ để dò API hỗ trợ. Production action chưa có policy rõ ràng chỉ cho read-only.
+
+## Execution evidence — 2026-10-04
+
+Pipeline/jobs/stages/bridges/run/retry/cancel/manual policy, secure mutation journal, trace UI và bounded artifact implementation đã có source; mutation/policy/stream/CDN redirect tests pass.
+
+Log/artifact đang khóa mặc định tới native PoC; mọi CI write cần owner-verified policy, chưa native CI journey/memory/quota/checksum.
+
+Checkbox đã đánh dấu ghi nhận task source-level, không chứng nhận acceptance/native/live của toàn phase. Dòng Status ở đầu là snapshot ban đầu; overall plan vẫn in-progress. [Final report](../reports/implementation-261004-1903-current-plan.md) chứa coverage và questions/assumptions; [verification](../../docs/verification-results.md) ghi check thực tế.

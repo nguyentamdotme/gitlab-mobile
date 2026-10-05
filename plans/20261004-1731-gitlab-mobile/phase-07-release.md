@@ -17,9 +17,9 @@
 ### CI kiểm chứng app
 
 - [ ] GitLab pipeline stages: install/verify/unit/contract/build; pnpm frozen lockfile, cache key theo lockfile/toolchain; mobile/backend lint/typecheck/tests; reports JUnit/coverage.
-- [ ] Secret scan và dependency vulnerability check không in matching secret values; review scopes/public config/bundle. CI variables bảo vệ và masked, không echo credentials hoặc export toàn env.
+- [x] Secret scan và dependency vulnerability check không in matching secret values; review scopes/public config/bundle. CI variables bảo vệ và masked, không echo credentials hoặc export toàn env.
 - [ ] Native Android artifact build reproducible; iOS requires macOS runner/EAS strategy. Không hứa Linux GitLab runner tự build iOS được.
-- [ ] Fast unit/fixture checks tự động mỗi MR; read-only contract scheduled/opt-in với allowlisted sandbox. Live write tests không chạy tự động trên production hoặc mọi MR không tin cậy.
+- [x] Fast unit/fixture checks tự động mỗi MR; read-only contract scheduled/opt-in với allowlisted sandbox. Live write tests không chạy tự động trên production hoặc mọi MR không tin cậy.
 - [ ] Build distribution và store submission là manual/protected jobs; không publish/deploy hoặc push config vào GitLab account thật khi chỉ đang lập kế hoạch.
 
 ### Validation matrix
@@ -40,7 +40,7 @@
 - [ ] Measure JS/native memory, render responsiveness, network bytes và battery khi xem CI/log; background polling dừng. Không đạt budget thì giảm page/buffer/poll theo đo đạc, không đổi metric để làm báo cáo đẹp.
 - [ ] Soak phiên thực tế ít nhất 7 ngày trên sandbox và fake-clock 30 ngày; phân biệt 2 loại bằng chứng. Grant revoked vẫn reconnect đúng, không cam kết login vô thời hạn.
 - [ ] Release build signed, secure backup/no untrusted OTA capability changes, versioned schema migration, emergency disable risky feature/download nếu cần. OTA/native update policy phải tuân thủ store và không dùng để bypass review.
-- [ ] Privacy disclosure: credentials trên thiết bị, generic push metadata/retention ở service, user revoke/unlink/delete instructions; crash/telemetry disabled mặc định hoặc opt-in có scrub được test.
+- [x] Privacy disclosure: credentials trên thiết bị, generic push metadata/retention ở service, user revoke/unlink/delete instructions; crash/telemetry disabled mặc định hoặc opt-in có scrub được test.
 - [ ] Recheck Apple/Google SDK/submission rules và Expo toolchain hiện hành lúc release; không dùng deadline cũ trong kế hoạch làm căn cứ.
 - [ ] Internal Android → TestFlight/internal iOS → user acceptance → production opt-in. Store account/hosting/signing/domain budget thuộc owner quyết định; không tự mua hoặc deploy.
 - [ ] Incident playbook: revoke application/user grant, disable push registration, rotate webhook/app-service keys, kill risky feature, clear cache/device data; không xóa data hoặc pipeline của user để chữa lỗi.
@@ -58,3 +58,11 @@
 ## Failure protocol
 
 Fix targeted blocker rồi rerun nearest test và toàn bộ affected contract. Không publish nếu còn crash/auth leak/production action thiếu gate, failed native build hoặc chưa có device coverage được yêu cầu. Thiếu tài khoản/license/hardware chỉ ghi blocker + hành động owner cần làm; không tự bỏ gate để hoàn tất plan.
+
+## Execution evidence — 2026-10-04
+
+GitLab CI verify/integration/iOS JS bundle, secret scan, dev/security/privacy/release docs và native smoke runner đã có. Final type/lint/unit/Doctor/bundle pass.
+
+Audit fail với 2 high upstream; chưa signed RC/device E2E/live matrix/performance/7-day soak. Store publish thuộc giai đoạn khác.
+
+Checkbox đã đánh dấu ghi nhận task source-level, không chứng nhận acceptance/native/live của toàn phase. Dòng Status ở đầu là snapshot ban đầu; overall plan vẫn in-progress. [Final report](../reports/implementation-261004-1903-current-plan.md) chứa coverage và questions/assumptions; [verification](../../docs/verification-results.md) ghi check thực tế.

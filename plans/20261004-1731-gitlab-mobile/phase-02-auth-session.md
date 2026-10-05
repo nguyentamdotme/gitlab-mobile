@@ -23,20 +23,20 @@ Credential record chứa schemaVersion, authKind, account identity, access token
 
 ## Tasks
 
-- [ ] Implement URL normalization giữ subpath/port, HTTPS và trusted origin; không gửi credentials của account A sang instance B.
-- [ ] Implement PKCE S256, random `state`, exact redirect, TTL, canceled/denied flow và single-use callback. Khi app bị kill mất pending verifier thì khởi động lại login, không nhận code không còn liên kết phiên.
-- [ ] Exchange code không có client secret. Xác định user `/user` và scopes trước khi commit session; thiếu response field quan trọng phải reject có kiểm soát.
-- [ ] Restore từ SecureStore, refresh trước request khi token còn <60s; dùng server response lifetime, không hardcode 7200. Chỉ foreground/request-triggered refresh.
-- [ ] Single-flight theo account: các request khác đợi cùng promise. Sau refresh, save cặp token mới và generation trước khi publish; không hai refresh dùng cùng old token.
-- [ ] Generation guard: logout/switch account tăng generation; refresh/query trả muộn không được lưu hoặc cập nhật session cũ. Hủy request và polling của account không active.
-- [ ] Phân biệt invalid_grant/revocation với network/429/5xx. Timeout sau dispatch có thể đã xoay token: không retry old refresh tự động vô hạn; dùng trạng thái outcome unknown và hướng reconnect nếu không phục hồi an toàn.
-- [ ] Lưu lỗi save/crash-window thành reconnect-required khi không đảm bảo cặp token bền vững; không hứa transaction phân tán. Test crash sau server rotation, trước save.
-- [ ] 401 không replay lệnh ghi: chỉ GET có thể refresh và retry một lần. Flow mutation dùng preflight ensureValidToken, khi 401 thì refresh cho thao tác tiếp theo và reconcile/để user retry có xác nhận.
-- [ ] App lock sau background timeout cấu hình; mặc định đề xuất 5 phút khi người dùng bật lock. Step-up production xác thực sinh trắc học/device credential; nếu không có local auth phải bật hướng xác nhận thay thế theo policy, không coi local PIN custom là bảo vệ ngang Keystore.
-- [ ] Credentials được bảo vệ bởi OS store; baseline `requireAuthentication` không bật tự động để tránh prompt mỗi refresh. Chế độ bảo vệ chặt hơn chỉ bật sau khi thử prompt/save/key invalidation trên cả nền tảng; app lock cũng che UI/previews và xóa nhạy cảm RAM khi khóa.
+- [x] Implement URL normalization giữ subpath/port, HTTPS và trusted origin; không gửi credentials của account A sang instance B.
+- [x] Implement PKCE S256, random `state`, exact redirect, TTL, canceled/denied flow và single-use callback. Khi app bị kill mất pending verifier thì khởi động lại login, không nhận code không còn liên kết phiên.
+- [x] Exchange code không có client secret. Xác định user `/user` và scopes trước khi commit session; thiếu response field quan trọng phải reject có kiểm soát.
+- [x] Restore từ SecureStore, refresh trước request khi token còn <60s; dùng server response lifetime, không hardcode 7200. Chỉ foreground/request-triggered refresh.
+- [x] Single-flight theo account: các request khác đợi cùng promise. Sau refresh, save cặp token mới và generation trước khi publish; không hai refresh dùng cùng old token.
+- [x] Generation guard: logout/switch account tăng generation; refresh/query trả muộn không được lưu hoặc cập nhật session cũ. Hủy request và polling của account không active.
+- [x] Phân biệt invalid_grant/revocation với network/429/5xx. Timeout sau dispatch có thể đã xoay token: không retry old refresh tự động vô hạn; dùng trạng thái outcome unknown và hướng reconnect nếu không phục hồi an toàn.
+- [x] Lưu lỗi save/crash-window thành reconnect-required khi không đảm bảo cặp token bền vững; không hứa transaction phân tán. Test crash sau server rotation, trước save.
+- [x] 401 không replay lệnh ghi: chỉ GET có thể refresh và retry một lần. Flow mutation dùng preflight ensureValidToken, khi 401 thì refresh cho thao tác tiếp theo và reconcile/để user retry có xác nhận.
+- [x] App lock sau background timeout cấu hình; mặc định đề xuất 5 phút khi người dùng bật lock. Step-up production xác thực sinh trắc học/device credential; nếu không có local auth phải bật hướng xác nhận thay thế theo policy, không coi local PIN custom là bảo vệ ngang Keystore.
+- [x] Credentials được bảo vệ bởi OS store; baseline `requireAuthentication` không bật tự động để tránh prompt mỗi refresh. Chế độ bảo vệ chặt hơn chỉ bật sau khi thử prompt/save/key invalidation trên cả nền tảng; app lock cũng che UI/previews và xóa nhạy cảm RAM khi khóa.
 - [ ] Implement PAT nhập kín và xóa clipboard theo lựa chọn; không tự copy token, không hứa clipboard của OS được kiểm soát tuyệt đối. PAT không refresh và không tự rotate khi user chưa xác nhận.
 - [ ] Logout: cancel first, best-effort OAuth revoke theo public-client hỗ trợ đã PoC, xóa store/cache/downloads/subscriptions; local logout offline luôn hoạt động. PAT nhập tay không mặc định revoke toàn token user dùng ở nơi khác; cung cấp unlink và hướng dẫn revoke.
-- [ ] Android backup exclusion; first-install marker phát hiện Keychain còn sót ở iOS/reinstall; credentials không được migrate sang thiết bị khác theo policy khả thi.
+- [x] Android backup exclusion; first-install marker phát hiện Keychain còn sót ở iOS/reinstall; credentials không được migrate sang thiết bị khác theo policy khả thi.
 
 ## Acceptance criteria và test gate
 
@@ -52,3 +52,11 @@ Scripts **sẽ tạo và chạy khi implement**: `pnpm --filter mobile test:auth
 ## Failure protocol
 
 Không giữ hoặc log secret để debug. Public revocation semantics chưa được instance chứng minh thì chỉ báo “đã xóa phiên trên thiết bị”, không claim grant revoked. Live reauth/SSO case cần policy owner; không thu GitLab password trong UI native.
+
+## Execution evidence — 2026-10-04
+
+OAuth PKCE/PAT, SecureStore, rotation-pending marker, single-flight refresh, account epoch/cancel, app lock, restore/switch/logout và redaction đã có source; auth/security unit pass.
+
+Chưa public-client exchange/SSO/revoke thật, biometric/reinstall/backup device matrix hoặc real-world soak.
+
+Checkbox đã đánh dấu ghi nhận task source-level, không chứng nhận acceptance/native/live của toàn phase. Dòng Status ở đầu là snapshot ban đầu; overall plan vẫn in-progress. [Final report](../reports/implementation-261004-1903-current-plan.md) chứa coverage và questions/assumptions; [verification](../../docs/verification-results.md) ghi check thực tế.

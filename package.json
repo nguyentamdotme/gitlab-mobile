@@ -1,0 +1,20 @@
+{
+  "name": "gitlab-mobile-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@12.9.1",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test:unit": "pnpm -r test",
+    "test:contracts:fixtures": "pnpm --filter mobile test:contracts",
+    "test:security": "pnpm --filter mobile test:security",
+    "test:contracts:read": "node scripts/read-contracts.mjs",
+    "test:e2e:native": "node scripts/native-e2e.mjs",
+    "test:notifications:integration": "pnpm --filter notification-service test:integration",
+    "verify": "pnpm typecheck && pnpm lint && pnpm test:unit"
+  }
+}

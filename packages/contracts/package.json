@@ -1,0 +1,19 @@
+{
+  "name": "@gitlab-mobile/contracts",
+  "private": true,
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.5",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.0"
+  }
+}

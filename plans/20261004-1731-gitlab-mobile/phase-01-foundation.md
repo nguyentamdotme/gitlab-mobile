@@ -6,7 +6,7 @@
 
 ## Phạm vi và files dự kiến
 
-Đường dẫn trong toàn bộ kế hoạch là đường dẫn đầy đủ từ repository root, **chưa tồn tại**, trừ `README.md`.
+Các đường dẫn dưới đây là dự kiến khi lập plan; source hiện tại dùng routes `apps/mobile/src/app` và gộp module theo boundary. Xem docs index và report để tìm owner thực tế.
 
 | Hành động | Đường dẫn | Trách nhiệm |
 |---|---|---|
@@ -22,14 +22,14 @@
 
 - [ ] Chốt instance GitLab.com/Self-Managed, version thấp nhất, subpath, VPN/CA và sandbox project. Nếu chưa có instance thực, ghi rõ chưa chứng minh khả năng kết nối/live contract.
 - [ ] Chốt Android/iOS, bundle/package IDs, domain HTTPS callback production và scheme dev riêng. Không dùng domain ví dụ làm production redirect.
-- [ ] Chọn Expo SDK stable từ official compatibility matrix, Node/package manager tương thích; scaffold workspace/mobile bằng công cụ/package manager. Xác nhận dependency mới trước khi cài; không sửa lockfile/manifests thủ công.
-- [ ] Thiết lập TypeScript strict, lint, formatting, Jest, Testing Library và scripts thống nhất; `.gitignore` loại trừ local secret/test session/build output. Chưa cần UI library lớn.
+- [x] Chọn Expo SDK stable từ official compatibility matrix, Node/package manager tương thích; scaffold workspace/mobile bằng công cụ/package manager. Xác nhận dependency mới trước khi cài; không sửa lockfile/manifests thủ công.
+- [x] Thiết lập TypeScript strict, lint, formatting, Jest, Testing Library và scripts thống nhất; `.gitignore` loại trừ local secret/test session/build output. Chưa cần UI library lớn.
 - [ ] Native development build trên Android; iOS build khi có macOS/EAS access. Không dùng Expo Go để chứng minh OAuth/deep link/push.
 - [ ] Đăng ký public/non-confidential OAuth application qua người có quyền; scope `api`, exact dev/prod redirect. Ghi Application ID vào config không bí mật; Client Secret không được nhập app hoặc repo.
 - [ ] PoC system-browser OAuth callback + PKCE S256 + token exchange + refresh không có client secret. Nếu instance không cho public client, dừng và quyết định PAT fallback hoặc auth proxy; không nhúng secret để “fix”.
 - [ ] PoC auth redirect cold start/warm start/canceled; xác định app có nhận được HTTPS App/Universal Link trên bản SDK chọn hay không. Static domain association không cần backend giữ token.
 - [ ] PoC tải trace có giới hạn byte và binary artifact qua redirect; kiểm chứng transport không chuyển auth sang origin khác. Nếu không kiểm soát được redirects bằng Expo transport hiện tại, cần adapter native được đánh giá hoặc vô hiệu hóa download; không chọn cách rò token.
-- [ ] Tạo fixture synthetic cho role/version/trạng thái; không lấy logs thật chứa secrets làm fixture. Prototype navigation 5 tabs và screen map, chưa cần render thiết kế pixel-perfect.
+- [x] Tạo fixture synthetic cho role/version/trạng thái; không lấy logs thật chứa secrets làm fixture. Prototype navigation 5 tabs và screen map, chưa cần render thiết kế pixel-perfect.
 
 ## Acceptance criteria
 
@@ -48,3 +48,11 @@ Manual checks: callback exact match; wrong `state`; host mismatch; dev vs produc
 ## Failure protocol
 
 Blocker về OAuth policy, TLS, domain ownership hoặc native redirect phải được quyết định trước phase 02. Không bypass certificate validation, không downgrade HTTPS, không tiếp tục xây flow dựa trên callback chưa hoạt động. Thiếu iOS/real device không làm giả claim cross-platform: ghi pending coverage và khóa release gate tương ứng.
+
+## Execution evidence — 2026-10-04
+
+Workspace Expo SDK 57 đã scaffold bằng CLI; frozen install, strict TypeScript/lint/Jest, 5 tabs, DTO fixtures và iOS JS export/CNG đạt.
+
+Chưa target instance/sandbox, OAuth public-client live, native signed/device và native transfer PoC; iPhone ưu tiên theo người dùng.
+
+Checkbox đã đánh dấu ghi nhận task source-level, không chứng nhận acceptance/native/live của toàn phase. Dòng Status ở đầu là snapshot ban đầu; overall plan vẫn in-progress. [Final report](../reports/implementation-261004-1903-current-plan.md) chứa coverage và questions/assumptions; [verification](../../docs/verification-results.md) ghi check thực tế.

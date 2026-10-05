@@ -32,18 +32,18 @@ Một user mất project permission có thể vẫn nhận generic ping cho tớ
 ## Tasks
 
 - [ ] Receiver chỉ hỗ trợ instance registry allowlisted do operator quản lý; arbitrary self-managed URLs không được backend fetch. Validate origin + base path và egress allowlist chống SSRF, block cloud metadata/loopback/private ranges trừ private instance đã quản trị explicit; chống redirect escape/DNS rebinding bằng network controls.
-- [ ] Verify user/project mỗi create/renew/resolve subscription; session bound instance + numeric user + device, chống IDOR/cross-account/subscription tampering. GitLab token transient không log body/header và không lưu DB.
-- [ ] App-service session TTL/rotation/revocation/rate limits; push address không là auth credential. DeviceNotRegistered deactivate token; update push token trên reinstall và rotation.
-- [ ] Project hook registration riêng và matching project ID; quản lý webhook cần admin/Maintainer/Owner. Developer dùng app vẫn vận hành CI dù không tự bật push được.
-- [ ] Legacy `X-Gitlab-Token`: constant-time secret compare qua HTTPS, lưu secret mã hóa at rest; đây không phải HMAC payload. Instance hỗ trợ `signing_token` (19.0+, flag/GA theo version) ưu tiên HMAC verifier theo official algorithm/raw body/timestamp, không tự đoán canonicalization.
-- [ ] Validate schema/body size/rate/timestamp khi có signature; mismatch project/registration reject. Dedupe event UUID hoặc stable event identity theo loại event; duplicate/out-of-order không tạo spam hoặc đổi state ngược.
-- [ ] Không log webhook secret/payload; lưu normalized IDs/event type/time, bỏ commit message/comment/body/variables. Metadata event giữ mặc định 7 ngày; outbox processed purge theo retention; credentials/hash giữ tới revoke/expiry policy.
-- [ ] Preferences project/event/quiet hours; coalesce events để tránh pipeline và mọi job đều spam; retry Expo Push có backoff, theo ticket/receipt kết quả chứ không chỉ HTTP 200.
-- [ ] Async receiver nhận event → transaction outbox → reply; worker retry lỗi transient, dead-letter bounded và ops health/readiness. Trước **mỗi lần gửi/retry**, kiểm tra lại subscription/session/device active, owner/account mapping, lease chưa hết, preferences/quiet hours và event TTL; expired/revoked rows bị drop, không gửi lại vì đã enqueue trước đó. Không thêm Redis trước khi có bằng chứng cần.
-- [ ] Push đã được APNs/FCM chấp nhận không thể bảo đảm thu hồi khỏi OS queue; logout/lease expiry có thể còn generic ping trễ. Payload luôn opaque, app không resolve/hiển thị private data nếu session hoặc quyền không còn hợp lệ. Ghi giới hạn này trong UX/privacy thay vì hứa không bao giờ có thông báo muộn.
-- [ ] Logout online revoke device service session/subscriptions; offline logout xóa local data, không thể ngay lập tức xóa subscription ở server. Dùng unsubscribe handle không cấp quyền đọc/ghi, giữ riêng trong secure cleanup queue để gửi khi app online lại; lease cuối cùng vẫn chặn stale delivery. Queue cleanup này không phải offline CI mutation queue.
+- [x] Verify user/project mỗi create/renew/resolve subscription; session bound instance + numeric user + device, chống IDOR/cross-account/subscription tampering. GitLab token transient không log body/header và không lưu DB.
+- [x] App-service session TTL/rotation/revocation/rate limits; push address không là auth credential. DeviceNotRegistered deactivate token; update push token trên reinstall và rotation.
+- [x] Project hook registration riêng và matching project ID; quản lý webhook cần admin/Maintainer/Owner. Developer dùng app vẫn vận hành CI dù không tự bật push được.
+- [x] Legacy `X-Gitlab-Token`: constant-time secret compare qua HTTPS, lưu secret mã hóa at rest; đây không phải HMAC payload. Instance hỗ trợ `signing_token` (19.0+, flag/GA theo version) ưu tiên HMAC verifier theo official algorithm/raw body/timestamp, không tự đoán canonicalization.
+- [x] Validate schema/body size/rate/timestamp khi có signature; mismatch project/registration reject. Dedupe event UUID hoặc stable event identity theo loại event; duplicate/out-of-order không tạo spam hoặc đổi state ngược.
+- [x] Không log webhook secret/payload; lưu normalized IDs/event type/time, bỏ commit message/comment/body/variables. Metadata event giữ mặc định 7 ngày; outbox processed purge theo retention; credentials/hash giữ tới revoke/expiry policy.
+- [x] Preferences project/event/quiet hours; coalesce events để tránh pipeline và mọi job đều spam; retry Expo Push có backoff, theo ticket/receipt kết quả chứ không chỉ HTTP 200.
+- [x] Async receiver nhận event → transaction outbox → reply; worker retry lỗi transient, dead-letter bounded và ops health/readiness. Trước **mỗi lần gửi/retry**, kiểm tra lại subscription/session/device active, owner/account mapping, lease chưa hết, preferences/quiet hours và event TTL; expired/revoked rows bị drop, không gửi lại vì đã enqueue trước đó. Không thêm Redis trước khi có bằng chứng cần.
+- [x] Push đã được APNs/FCM chấp nhận không thể bảo đảm thu hồi khỏi OS queue; logout/lease expiry có thể còn generic ping trễ. Payload luôn opaque, app không resolve/hiển thị private data nếu session hoặc quyền không còn hợp lệ. Ghi giới hạn này trong UX/privacy thay vì hứa không bao giờ có thông báo muộn.
+- [x] Logout online revoke device service session/subscriptions; offline logout xóa local data, không thể ngay lập tức xóa subscription ở server. Dùng unsubscribe handle không cấp quyền đọc/ghi, giữ riêng trong secure cleanup queue để gửi khi app online lại; lease cuối cùng vẫn chặn stale delivery. Queue cleanup này không phải offline CI mutation queue.
 - [ ] Native push deep link cold/warm/background, wrong account/expired event/deleted project/logout state; không chạy approve/deploy từ notification action.
-- [ ] Expose privacy/disable push/delete service data; backend outage không chặn direct GitLab login/API. GitLab private instance không reachable verification/webhook thì thông báo feature unavailable.
+- [x] Expose privacy/disable push/delete service data; backend outage không chặn direct GitLab login/API. GitLab private instance không reachable verification/webhook thì thông báo feature unavailable.
 
 ## Acceptance criteria và test gate
 
@@ -58,3 +58,11 @@ Scripts **sẽ tạo**: `pnpm --filter notification-service test`, `pnpm --filte
 ## Failure protocol
 
 Thiếu hosting/domain/Maintainer hoặc network reachability thì backend push là blocked, không hứa mobile-only background notifications đáng tin cậy. Gate phiên bản/tier ký webhook cần fixture và live test; không coi header event name là xác thực. Deploy thực tế yêu cầu opt-in riêng.
+
+## Execution evidence — 2026-10-04
+
+Fastify/PostgreSQL signed/legacy receiver, session/device/subscription/event verification, transactional outbox/receipts/retention và mobile routing có source. Backend unit 21, DB integration 10 và mobile notification tests pass.
+
+Chưa hosted HTTPS receiver, hooks thật, APNs/FCM provision và cold/warm/background delivery trên thiết bị.
+
+Checkbox đã đánh dấu ghi nhận task source-level, không chứng nhận acceptance/native/live của toàn phase. Dòng Status ở đầu là snapshot ban đầu; overall plan vẫn in-progress. [Final report](../reports/implementation-261004-1903-current-plan.md) chứa coverage và questions/assumptions; [verification](../../docs/verification-results.md) ghi check thực tế.

@@ -1,0 +1,40 @@
+image: node:24.21.0
+stages: [verify, integration, bundle]
+default:
+  before_script:
+    - npm install -g pnpm@12.9.1
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install --frozen-lockfile
+  cache:
+    key:
+      files: [pnpm-lock.yaml]
+    paths: [.pnpm-store/]
+verify:
+  stage: verify
+  script:
+    - pnpm -r typecheck
+    - pnpm -r lint
+    - pnpm test:unit
+    - pnpm test:contracts:fixtures
+    - pnpm test:security
+    - node scripts/secret-scan.mjs
+    - pnpm audit --prod --audit-level high
+notifications-integration:
+  stage: integration
+  image: node:24.21.0
+  services:
+    - name: postgres:17-alpine
+      alias: notification-test-db
+  variables:
+    POSTGRES_PASSWORD: disposable-ci-password
+    TEST_DATABASE_URL: postgres://postgres:disposable-ci-password@notification-test-db:5432/postgres
+  script:
+    - apt-get update && apt-get install -y postgresql-client
+    - PGHOST=notification-test-db PGUSER=postgres PGPASSWORD=disposable-ci-password pg_dump postgres > /tmp/notification-before-migration.sql
+    - TEST_DATABASE_BACKUP=/tmp/notification-before-migration.sql pnpm --filter notification-service exec vitest run --config vitest-integration.config.ts
+ios-bundle:
+  stage: bundle
+  script: [pnpm --filter mobile bundle:ios]
+  artifacts:
+    paths: [apps/mobile/dist/]
+    expire_in: 7 days

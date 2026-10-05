@@ -1,0 +1,10 @@
+packages:
+  - apps/*
+  - packages/*
+nodeLinker: hoisted
+minimumReleaseAge: 1440
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true
+overrides:
+  test-renderer: 1.2.0

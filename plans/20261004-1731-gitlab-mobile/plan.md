@@ -1,7 +1,7 @@
 ---
 title: "GitLab Mobile — kịch bản sản phẩm và kế hoạch triển khai"
 description: "App React Native tương tác GitLab qua API, duy trì phiên an toàn và ưu tiên vận hành CI/CD trên điện thoại."
-status: pending
+status: in-progress
 priority: P2
 effort: "360h / 45 ngày công, chưa gồm thời gian chờ hạ tầng và duyệt store"
 branch: agent-01M43ZGEXHB536RMF24NZK6T0E
@@ -19,12 +19,12 @@ Xây dựng app iOS/Android để xem project, xử lý issue/Merge Request (MR)
 
 **Quyết định đề xuất:** React Native + Expo + TypeScript; OAuth 2.0 Authorization Code với PKCE; GitLab access/refresh token lưu trên thiết bị; app gọi trực tiếp GitLab. Bổ sung backend nhỏ riêng cho webhook và push notification khi cần nhận cảnh báo lúc app đóng.
 
-Đây là **kế hoạch**, không phải app đã triển khai. Repo hiện chỉ có `README.md`; tất cả đường dẫn source và scripts bên dưới là thành phần **sẽ tạo**, chưa tồn tại. Chưa cài dependency, tạo OAuth application, đăng nhập tài khoản thật, chạy pipeline, sửa GitLab hay deploy backend.
+Đây là plan thiết kế và acceptance contract. Source mobile/service đã được triển khai trong đợt thực thi; xem [report implementation và giả định](../reports/implementation-261004-1903-current-plan.md) cùng [verification results](../../docs/verification-results.md). File/module cụ thể đã được gộp theo boundary thực tế; không phải mọi tên file dự kiến bên dưới đều được tạo riêng. Chưa có native signed build/device/live GitLab/push hoặc deploy backend; plan còn in-progress.
 
 ### Giả định để có thể lập kế hoạch ngay
 
 - “ReactJS mobile” được hiểu là React Native, không phải React web/PWA. Kiến thức React được tái sử dụng nhưng UI dùng native components, không dùng HTML/DOM.
-- Hỗ trợ Android và iOS, ưu tiên Android để ra bản thử nghiệm; tiếng Việt mặc định, chuẩn bị i18n cho tiếng Anh.
+- Hỗ trợ source Android/iOS; ưu tiên iPhone qua cáp theo quyết định người dùng lúc thực thi. Publish Apple Developer ở giai đoạn khác. Tiếng Việt mặc định.
 - GitLab.com là cấu hình mặc định; GitLab Self-Managed qua HTTPS/VPN cũng được hỗ trợ với OAuth client riêng cho từng instance.
 - Baseline dự kiến: GitLab 17.0+ cho tính năng lõi; xác nhận bản thấp nhất cần hỗ trợ ở phase 01. Không mặc định GitLab mới nhất hoặc gói Ultimate.
 - Nhóm nhỏ/cá nhân là đối tượng ban đầu; một tài khoản đang hoạt động tại một thời điểm nhưng dữ liệu và phiên luôn phân tách theo instance + user.
@@ -126,9 +126,9 @@ Logout: ngừng request/polling, xóa credentials/cache/file tạm, bỏ subscri
 - HTTP layer dùng `fetch` với timeout, AbortController, auth injection, concurrency limit, typed adapters và runtime validation tại các response quan trọng.
 - Expo FileSystem + Sharing cho artifacts; notification module khi phase 06 được bật.
 - Jest + React Native Testing Library; Maestro cho E2E native; contract tests dựa trên fixtures phiên bản GitLab mục tiêu.
-- Chọn Expo SDK stable tại phase 01 rồi pin toolchain/lockfile và dùng dependency versions tương thích; không chọn số version theo trí nhớ. Dependency trong tài liệu là đề xuất, chưa được cài.
+- Chọn Expo SDK stable tại phase 01 rồi pin toolchain/lockfile và dùng dependency versions tương thích; không chọn số version theo trí nhớ. Dependency thực tế được quản lý bằng workspace manifests/lockfile; xem development docs.
 
-Các module dự kiến: `apps/mobile/src/core/auth`, `core/gitlab`, `core/security`, `core/storage`, `features/projects`, `issues`, `merge-requests`, `pipelines`, `jobs`, `environments`, `schedules`, `notifications`. Route files nằm trong `apps/mobile/app`; model dùng chung không chứa secret nằm trong `packages/contracts`.
+Các module dự kiến: `apps/mobile/src/core/auth`, `core/gitlab`, `core/security`, `core/storage`, `features/projects`, `issues`, `merge-requests`, `pipelines`, `jobs`, `environments`, `schedules`, `notifications`. Route thực tế nằm trong `apps/mobile/src/app`; model dùng chung không chứa secret nằm trong `packages/contracts`.
 
 ### Backend chỉ dành cho notification
 
@@ -219,7 +219,7 @@ Mỗi phase liệt kê file dự kiến tạo, checklist tasks, failure handling
 | Notification đến user đã mất quyền | Payload opaque không có project/log/status; subscription lease ngắn; revalidate GitLab khi mở event |
 | Self-Managed private chỉ vào được bằng VPN | UI network guidance; push chỉ khi webhook/verification backend reachability đạt |
 
-Có thể tiếp tục với mặc định đề xuất, nhưng trước khi đăng ký dịch vụ/build cần xác nhận **instance GitLab mục tiêu + version**, **Android hay cả iOS**, **project sandbox + policy deploy**, và **có triển khai backend notification/domain hay không**. Các secret/token không gửi trong chat hoặc plan.
+Người dùng đã cho phép bỏ human-gate và chọn giả định phù hợp dự án; toàn bộ câu hỏi/assumed answers được ghi trong delivery report. iPhone local build là ưu tiên hiện tại; Apple Developer publish để sau. Instance/sandbox/OAuth/policy/hosting chưa được cung cấp không được thay bằng dữ liệu giả hoặc suy ra đã kiểm chứng. Secret/token không gửi trong chat hoặc plan.
 
 ## 10. Nguồn chính thức và mức kiểm chứng
 
@@ -236,7 +236,7 @@ Có thể tiếp tục với mặc định đề xuất, nhưng trước khi đ�
 
 ### Validation log
 
-Đã xác nhận repo greenfield, đọc tài liệu OAuth/CI chính thức và xây hợp đồng endpoint theo khả năng/version. Chưa kiểm chứng bằng tài khoản thật, native build hoặc thiết bị; các test commands và source paths đều là deliverables tương lai. Checklist/review tài liệu không phải bằng chứng app đã chạy.
+Bản lập plan ban đầu xác nhận repo greenfield và đối chiếu OAuth/CI docs. Đợt implementation đã tạo workspace/source/scripts và chạy các check được ghi trong report; các đường dẫn thiết kế không phải inventory hiện tại. Chưa kiểm chứng tài khoản thật/native signed build/device. Checklist source và fixtures không thay native acceptance gate.
 
 ### Rà soát độc lập và consistency sweep
 

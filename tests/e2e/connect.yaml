@@ -1,0 +1,10 @@
+appId: org.tani.gitlabmobile
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Kết nối GitLab"
+- assertVisible: "Instance HTTPS"
+- tapOn: "Dùng Personal Access Token"
+- assertVisible: "Personal Access Token"
+- tapOn: "Dùng OAuth PKCE"
+- assertVisible: "Application ID (public / non-confidential)"
